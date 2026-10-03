@@ -22,7 +22,7 @@
 
         <section class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @foreach ($movies as $movie)
-            <x-movie-card :movie="$movie" :liked="in_array($movie['id'], $likedMovieIds, true)" />
+            <x-movie-card :movie="$movie" :liked="in_array($movie->id, $likedMovieIds, true)" />
             @endforeach
         </section>
     </div>

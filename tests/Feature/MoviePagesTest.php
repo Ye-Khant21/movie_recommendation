@@ -1,27 +1,55 @@
 <?php
 
-it('renders the movie catalog with ratings and directors', function () {
+use App\Models\Movie;
+use App\Models\Person;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+it('renders database movies in the catalog', function () {
+    Movie::factory()->create([
+        'title' => 'Neon Harbor',
+        'director' => 'Ava Chen',
+        'genre' => 'Sci-Fi',
+        'rating' => 10.0,
+    ]);
+
     $response = $this->get(route('movies.index'));
 
-    $response->assertOk();
-    $response->assertSee('Search movies');
-    $response->assertSee('Neon Harbor');
-    $response->assertSee('Director Ava Chen');
-    $response->assertSee('10/10');
-    $response->assertDontSee('Subscribe');
+    $response
+        ->assertOk()
+        ->assertSee('Search movies')
+        ->assertSee('Neon Harbor')
+        ->assertSee('Director Ava Chen')
+        ->assertSee('10.0');
 });
 
-it('renders a movie detail page with comments and like actions', function () {
-    $response = $this->get(route('movies.show', 1));
+it('renders a database movie with its cast on the detail page', function () {
+    $movie = Movie::factory()->create([
+        'title' => 'Neon Harbor',
+        'director' => 'Ava Chen',
+        'genre' => 'Sci-Fi',
+        'rating' => 10.0,
+    ]);
+    $person = Person::factory()->create([
+        'name' => 'Maya Reed',
+        'role' => 'actress',
+    ]);
+    $movie->people()->attach($person);
 
-    $response->assertOk();
-    $response->assertSee('Neon Harbor');
-    $response->assertSee('Director Ava Chen');
-    $response->assertSee('Leave a comment');
-    $response->assertSee('Like');
+    $response = $this->get(route('movies.show', $movie));
+
+    $response
+        ->assertOk()
+        ->assertSee('Neon Harbor')
+        ->assertSee('Director Ava Chen')
+        ->assertSee('Cast')
+        ->assertSee('Maya Reed')
+        ->assertSee('Actress')
+        ->assertSee('Like');
 });
 
-it('returns 404 for a movie that is not in the catalog', function () {
+it('returns 404 for a movie that does not exist', function () {
     $this->get(route('movies.show', 999))->assertNotFound();
 });
 

@@ -21,12 +21,21 @@
                 <li>
                     <a href="{{ route('movies.favorites') }}" class="text-sm text-mist transition hover:text-gold">Fan favourites</a>
                 </li>
-                <li>
-                    <a href="{{ route('login') }}" class="text-sm text-mist transition hover:text-gold">Login</a>
-                </li>
-                <li>
-                    <x-ui.button href="{{ route('register') }}">Register</x-ui.button>
-                </li>
+                @if(auth()->check())
+                  <li>
+                    <form method="POST" action="/logout">
+                        @csrf
+                        <button type="submit" class="text-sm text-mist transition hover:text-gold">Logout</button>
+                    </form>
+                  </li>
+                @else
+                  <li>
+                    <a href="/login" class="text-sm text-mist transition hover:text-gold">Login</a>
+                  </li>
+                  <li>
+                    <a href="/register" class="text-sm text-mist transition hover:text-gold">Register</a>
+                  </li>
+                @endif
             </ul>
         </nav>
     </div>

@@ -6,7 +6,7 @@
             <p class="max-w-2xl text-mist/80">The films you’ve liked are collected here for quick access to your top-tier queue.</p>
         </section>
 
-        @if ($movies === [])
+        @if ($movies->isEmpty())
         <div class="rounded-2xl border border-dashed border-line bg-panel p-8 text-center">
             <h2 class="text-xl font-semibold text-white">No favourites yet</h2>
             <p class="mt-2 text-mist/80">Head back to the catalog and like a few movies to build your personal 10/10 shelf.</p>
@@ -17,7 +17,7 @@
         @else
         <section class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @foreach ($movies as $movie)
-            <x-movie-card :movie="$movie" :liked="in_array($movie['id'], $likedMovieIds, true)" />
+            <x-movie-card :movie="$movie" :liked="in_array($movie->id, $likedMovieIds, true)" />
             @endforeach
         </section>
         @endif
