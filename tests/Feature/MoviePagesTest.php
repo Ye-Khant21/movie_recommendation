@@ -49,6 +49,26 @@ it('renders a database movie with its cast on the detail page', function () {
         ->assertSee('Like');
 });
 
+it('can filter movies by director, title, or genre', function () {
+    Movie::factory()->create([
+        'title' => 'Inception',
+        'director' => 'Christopher Nolan',
+        'genre' => 'Sci-Fi',
+    ]);
+    Movie::factory()->create([
+        'title' => 'Pulp Fiction',
+        'director' => 'Quentin Tarantino',
+        'genre' => 'Crime',
+    ]);
+
+    $response = $this->get(route('movies.index', ['search' => 'Nolan']));
+
+    $response
+        ->assertOk()
+        ->assertSee('Inception')
+        ->assertDontSee('Pulp Fiction');
+});
+
 it('returns 404 for a movie that does not exist', function () {
     $this->get(route('movies.show', 999))->assertNotFound();
 });

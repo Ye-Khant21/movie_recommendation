@@ -5,7 +5,7 @@
     <button
         type="submit"
         @class([
-            'inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition',
+            'inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition duration-200',
             'border-gold bg-gold text-ink hover:bg-gold-deep' => $liked,
             'border-line bg-transparent text-white hover:border-gold hover:text-gold' => ! $liked,
         ])

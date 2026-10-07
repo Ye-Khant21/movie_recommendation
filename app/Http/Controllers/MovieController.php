@@ -9,10 +9,11 @@ use Illuminate\View\View;
 
 class MovieController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+
         return view('movies.index', [
-            'movies' => Movie::query()->latest()->get(),
+            'movies' => Movie::latest()->filter($request->only(['search', 'genre', 'director']))->paginate(10)->withQueryString(),
             'likedMovieIds' => $this->likedMovieIds(),
         ]);
     }
