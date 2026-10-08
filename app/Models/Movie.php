@@ -18,7 +18,10 @@ class Movie extends Model
             $query->where(function ($query) use ($search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('genre', 'like', "%{$search}%")
-                    ->orWhere('director', 'like', "%{$search}%");
+                    ->orWhere('director', 'like', "%{$search}%")
+                    ->orWhereHas('people', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
+                    });
             });
         });
 
@@ -34,6 +37,16 @@ class Movie extends Model
     public function people(): BelongsToMany
     {
         return $this->belongsToMany(Person::class);
+    }
+
+    public function actors(): BelongsToMany
+    {
+        return $this->belongsToMany(Person::class)->where('role', 'actor');
+    }
+
+    public function actresses(): BelongsToMany
+    {
+        return $this->belongsToMany(Person::class)->where('role', 'actress');
     }
 
     /**

@@ -14,7 +14,7 @@
                         id="movie-search"
                         name="search"
                         type="search"
-                        placeholder="Search by title, director, or genre"
+                        placeholder="Search by title, director, actor, or genre"
                         class="h-12 w-full rounded-xl border border-line bg-ink-soft px-4 text-base text-white shadow-sm shadow-black/20 placeholder:text-mist/50 transition focus:border-gold focus:outline-none focus:ring-4 focus:ring-gold/15"
                         aria-label="Search movies"
                         value="{{ request('search') }}">

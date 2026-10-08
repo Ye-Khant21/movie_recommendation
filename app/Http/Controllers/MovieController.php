@@ -13,7 +13,7 @@ class MovieController extends Controller
     {
 
         return view('movies.index', [
-            'movies' => Movie::latest()->filter($request->only(['search', 'genre', 'director']))->paginate(10)->withQueryString(),
+            'movies' => Movie::with('people')->latest()->filter($request->only(['search', 'genre', 'director']))->paginate(10)->withQueryString(),
             'likedMovieIds' => $this->likedMovieIds(),
         ]);
     }
@@ -33,7 +33,7 @@ class MovieController extends Controller
         $likedMovieIds = $this->likedMovieIds();
 
         return view('movies.favorites', [
-            'movies' => Movie::query()->whereIn('id', $likedMovieIds)->latest()->get(),
+            'movies' => Movie::with('people')->whereIn('id', $likedMovieIds)->latest()->get(),
             'likedMovieIds' => $likedMovieIds,
         ]);
     }

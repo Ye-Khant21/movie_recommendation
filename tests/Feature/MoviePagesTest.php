@@ -6,13 +6,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('renders database movies in the catalog', function () {
-    Movie::factory()->create([
+it('renders database movies with actors and actresses in the catalog', function () {
+    $movie = Movie::factory()->create([
         'title' => 'Neon Harbor',
         'director' => 'Ava Chen',
         'genre' => 'Sci-Fi',
         'rating' => 10.0,
     ]);
+
+    $actor = Person::factory()->create(['name' => 'Leo Vance', 'role' => 'actor']);
+    $actress = Person::factory()->create(['name' => 'Maya Reed', 'role' => 'actress']);
+
+    $movie->people()->attach([$actor->id, $actress->id]);
 
     $response = $this->get(route('movies.index'));
 
@@ -21,6 +26,10 @@ it('renders database movies in the catalog', function () {
         ->assertSee('Search movies')
         ->assertSee('Neon Harbor')
         ->assertSee('Director Ava Chen')
+        ->assertSee('Actor:')
+        ->assertSee('Leo Vance')
+        ->assertSee('Actress:')
+        ->assertSee('Maya Reed')
         ->assertSee('10.0');
 });
 
@@ -49,21 +58,29 @@ it('renders a database movie with its cast on the detail page', function () {
         ->assertSee('Like');
 });
 
-it('can filter movies by director, title, or genre', function () {
-    Movie::factory()->create([
+it('can filter movies by director, title, genre, or actor name', function () {
+    $movie1 = Movie::factory()->create([
         'title' => 'Inception',
         'director' => 'Christopher Nolan',
         'genre' => 'Sci-Fi',
     ]);
-    Movie::factory()->create([
+    $movie2 = Movie::factory()->create([
         'title' => 'Pulp Fiction',
         'director' => 'Quentin Tarantino',
         'genre' => 'Crime',
     ]);
 
-    $response = $this->get(route('movies.index', ['search' => 'Nolan']));
+    $actor = Person::factory()->create(['name' => 'Leonardo DiCaprio', 'role' => 'actor']);
+    $movie1->people()->attach($actor);
 
-    $response
+    $responseByDirector = $this->get(route('movies.index', ['search' => 'Nolan']));
+    $responseByDirector
+        ->assertOk()
+        ->assertSee('Inception')
+        ->assertDontSee('Pulp Fiction');
+
+    $responseByActor = $this->get(route('movies.index', ['search' => 'Leonardo']));
+    $responseByActor
         ->assertOk()
         ->assertSee('Inception')
         ->assertDontSee('Pulp Fiction');

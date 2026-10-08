@@ -2,6 +2,8 @@
 
 @php
     $posterUrl = $movie->poster ?: 'https://www.primevideo.com/-/hi/detail/0P5699HX4S6UTRBOYYMCIGWTK3.jpg/ref=atv_hm_hom_c_8pXz9d_2_1';
+    $actors = $movie->people->filter(fn ($person) => strtolower($person->role) === 'actor')->pluck('name');
+    $actresses = $movie->people->filter(fn ($person) => strtolower($person->role) === 'actress')->pluck('name');
 @endphp
 
 <article class="group overflow-hidden rounded-2xl border border-line/70 bg-panel/80 shadow-lg shadow-black/15 transition duration-300 hover:-translate-y-1 hover:border-gold/60 hover:shadow-xl hover:shadow-black/25">
@@ -19,7 +21,20 @@
         <div class="flex flex-col gap-1.5 p-5">
             <h2 class="text-base font-semibold tracking-tight text-white">{{ $movie->title }}</h2>
             <p class="text-sm text-mist/80">Director {{ $movie->director ?? 'Not listed' }}</p>
-            <p class="text-xs text-mist/60">{{ $movie->genre }}</p>
+
+            @if ($actors->isNotEmpty())
+                <p class="text-xs text-mist/75">
+                    <span class="font-medium text-gold/90">Actor:</span> {{ $actors->join(', ') }}
+                </p>
+            @endif
+
+            @if ($actresses->isNotEmpty())
+                <p class="text-xs text-mist/75">
+                    <span class="font-medium text-gold/90">Actress:</span> {{ $actresses->join(', ') }}
+                </p>
+            @endif
+
+            <p class="text-xs text-mist/60 mt-0.5">{{ $movie->genre }}</p>
         </div>
     </a>
     <div class="px-5 pb-5">
