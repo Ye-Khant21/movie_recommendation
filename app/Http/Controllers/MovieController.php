@@ -11,9 +11,17 @@ class MovieController extends Controller
 {
     public function index(Request $request): View
     {
+        $genres = Movie::query()
+            ->select('genre')
+            ->distinct()
+            ->pluck('genre')
+            ->filter()
+            ->sort()
+            ->values();
 
         return view('movies.index', [
             'movies' => Movie::with('people')->latest()->filter($request->only(['search', 'genre', 'director']))->paginate(10)->withQueryString(),
+            'genres' => $genres,
             'likedMovieIds' => $this->likedMovieIds(),
         ]);
     }

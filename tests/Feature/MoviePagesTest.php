@@ -79,11 +79,11 @@ it('can filter movies by director, title, genre, or actor name', function () {
         ->assertSee('Inception')
         ->assertDontSee('Pulp Fiction');
 
-    $responseByActor = $this->get(route('movies.index', ['search' => 'Leonardo']));
-    $responseByActor
+    $responseByGenre = $this->get(route('movies.index', ['genre' => 'Crime']));
+    $responseByGenre
         ->assertOk()
-        ->assertSee('Inception')
-        ->assertDontSee('Pulp Fiction');
+        ->assertSee('Pulp Fiction')
+        ->assertDontSee('Inception');
 });
 
 it('returns 404 for a movie that does not exist', function () {
