@@ -28,7 +28,7 @@ class MovieController extends Controller
 
     public function show(Movie $movie): View
     {
-        $movie->load('people');
+        $movie->load(['people', 'comments.user']);
 
         return view('movies.show', [
             'movie' => $movie,

@@ -6,6 +6,7 @@ use Database\Factories\MovieFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Movie extends Model
 {
@@ -47,6 +48,11 @@ class Movie extends Model
     public function actresses(): BelongsToMany
     {
         return $this->belongsToMany(Person::class)->where('role', 'actress');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class)->latest();
     }
 
     /**

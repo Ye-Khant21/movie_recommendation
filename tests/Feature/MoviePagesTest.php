@@ -2,6 +2,7 @@
 
 use App\Models\Movie;
 use App\Models\Person;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -39,6 +40,7 @@ it('renders a database movie with its cast on the detail page', function () {
         'director' => 'Ava Chen',
         'genre' => 'Sci-Fi',
         'rating' => 10.0,
+        'body' => 'A rain-soaked port city hides a smuggling ring that trades in stolen memories.',
     ]);
     $person = Person::factory()->create([
         'name' => 'Maya Reed',
@@ -52,6 +54,8 @@ it('renders a database movie with its cast on the detail page', function () {
         ->assertOk()
         ->assertSee('Neon Harbor')
         ->assertSee('Director Ava Chen')
+        ->assertSee('About')
+        ->assertSee('A rain-soaked port city hides a smuggling ring that trades in stolen memories.')
         ->assertSee('Cast')
         ->assertSee('Maya Reed')
         ->assertSee('Actress')
@@ -88,6 +92,34 @@ it('can filter movies by director, title, genre, or actor name', function () {
 
 it('returns 404 for a movie that does not exist', function () {
     $this->get(route('movies.show', 999))->assertNotFound();
+});
+
+it('stores an authenticated user comment and displays it on the movie page', function () {
+    $user = User::factory()->create(['name' => 'Maya Reed']);
+    $movie = Movie::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->post(route('movies.comment', $movie), ['content' => 'The final scene stayed with me.']);
+
+    $response->assertRedirect(route('movies.show', $movie));
+    $this->assertDatabaseHas('comments', [
+        'user_id' => $user->id,
+        'movie_id' => $movie->id,
+        'content' => 'The final scene stayed with me.',
+    ]);
+
+    $this->get(route('movies.show', $movie))
+        ->assertOk()
+        ->assertSee('Maya Reed')
+        ->assertSee('The final scene stayed with me.');
+});
+
+it('requires authentication before storing a comment', function () {
+    $movie = Movie::factory()->create();
+
+    $this->post(route('movies.comment', $movie), ['content' => 'A comment'])
+        ->assertRedirect(route('login'));
 });
 
 it('renders the login, register, and fan favourites pages', function () {

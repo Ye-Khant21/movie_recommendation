@@ -16,5 +16,5 @@
         name="{{ $name }}"
         rows="{{ $rows }}"
         {{ $attributes->merge(['class' => 'w-full rounded-md border border-line bg-ink px-3 py-2 text-sm text-white outline-none placeholder:text-mist/40 focus:border-gold']) }}
-    ></textarea>
+    >{{ $slot }}</textarea>
 </div>

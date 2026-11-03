@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MovieController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,7 @@ Route::post('/login', [AuthController::class, 'postLogin'])->middleware('guest')
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 Route::get('/register', [AuthController::class, 'register'])->name('register')->middleware('guest');
 Route::post('/register', [AuthController::class, 'postRegister'])->middleware('guest');
+
+Route::post('/movies/{movie}/comments', [CommentController::class, 'store'])
+    ->middleware('auth')
+    ->name('movies.comment');
