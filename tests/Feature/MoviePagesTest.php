@@ -59,7 +59,7 @@ it('renders a database movie with its cast on the detail page', function () {
         ->assertSee('Cast')
         ->assertSee('Maya Reed')
         ->assertSee('Actress')
-        ->assertSee('Like');
+        ->assertSee('Log in to like');
 });
 
 it('can filter movies by director, title, genre, or actor name', function () {
@@ -120,6 +120,28 @@ it('requires authentication before storing a comment', function () {
 
     $this->post(route('movies.comment', $movie), ['content' => 'A comment'])
         ->assertRedirect(route('login'));
+});
+
+it('requires authentication before liking a movie', function () {
+    $movie = Movie::factory()->create();
+
+    $this->post(route('movies.like', $movie))
+        ->assertRedirect(route('login'));
+});
+
+it('allows an authenticated user to like a movie', function () {
+    $user = User::factory()->create();
+    $movie = Movie::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('movies.like', $movie))
+        ->assertRedirect()
+        ->assertSessionHas('liked_movies', [$movie->id]);
+
+    $this->actingAs($user)
+        ->get(route('movies.show', $movie))
+        ->assertOk()
+        ->assertSee('Liked');
 });
 
 it('renders the login, register, and fan favourites pages', function () {

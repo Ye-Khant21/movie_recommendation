@@ -16,7 +16,6 @@ class MovieController extends Controller
             ->distinct()
             ->pluck('genre')
             ->filter()
-            ->sort()
             ->values();
 
         return view('movies.index', [

@@ -11,7 +11,9 @@ Route::get('/fan-favourites', [MovieController::class, 'favorites'])->name('movi
 
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 
-Route::post('/movies/{movie}/like', [MovieController::class, 'toggleLike'])->name('movies.like');
+Route::post('/movies/{movie}/like', [MovieController::class, 'toggleLike'])
+    ->middleware('auth')
+    ->name('movies.like');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'postLogin'])->middleware('guest');
