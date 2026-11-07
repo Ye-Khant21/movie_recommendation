@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Genre;
 use App\Models\Movie;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,15 +12,10 @@ class MovieController extends Controller
 {
     public function index(Request $request): View
     {
-        $genres = Movie::query()
-            ->select('genre')
-            ->distinct()
-            ->pluck('genre')
-            ->filter()
-            ->values();
+        $genres = Genre::query()->orderBy('name')->pluck('name');
 
         return view('movies.index', [
-            'movies' => Movie::with('people')->latest()->filter($request->only(['search', 'genre', 'director']))->paginate(10)->withQueryString(),
+            'movies' => Movie::with(['genres', 'people'])->latest()->filter($request->only(['search', 'genre', 'director']))->paginate(10)->withQueryString(),
             'genres' => $genres,
             'likedMovieIds' => $this->likedMovieIds(),
         ]);
@@ -27,7 +23,7 @@ class MovieController extends Controller
 
     public function show(Movie $movie): View
     {
-        $movie->load(['people', 'comments.user']);
+        $movie->load(['genres', 'people', 'comments.user']);
 
         return view('movies.show', [
             'movie' => $movie,
@@ -40,7 +36,7 @@ class MovieController extends Controller
         $likedMovieIds = $this->likedMovieIds();
 
         return view('movies.favorites', [
-            'movies' => Movie::with('people')->whereIn('id', $likedMovieIds)->latest()->get(),
+            'movies' => Movie::with(['genres', 'people'])->whereIn('id', $likedMovieIds)->latest()->get(),
             'likedMovieIds' => $likedMovieIds,
         ]);
     }

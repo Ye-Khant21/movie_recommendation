@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\User;
@@ -7,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('renders database movies with actors and actresses in the catalog', function () {
+it('renders database movies with their genres and cast in the catalog', function () {
     $movie = Movie::factory()->create([
         'title' => 'Neon Harbor',
         'director' => 'Ava Chen',
@@ -15,10 +16,12 @@ it('renders database movies with actors and actresses in the catalog', function 
         'rating' => 10.0,
     ]);
 
-    $actor = Person::factory()->create(['name' => 'Leo Vance', 'role' => 'actor']);
-    $actress = Person::factory()->create(['name' => 'Maya Reed', 'role' => 'actress']);
+    $genre = Genre::factory()->create(['name' => 'Sci-Fi', 'slug' => 'sci-fi']);
+    $actor = Person::factory()->create(['name' => 'Leo Vance', 'role' => 'person']);
+    $actress = Person::factory()->create(['name' => 'Maya Reed', 'role' => 'person']);
 
-    $movie->people()->attach([$actor->id, $actress->id]);
+    $movie->genres()->attach($genre);
+    $movie->people()->attach([$actor->id => ['role' => 'cast'], $actress->id => ['role' => 'cast']]);
 
     $response = $this->get(route('movies.index'));
 
@@ -27,9 +30,8 @@ it('renders database movies with actors and actresses in the catalog', function 
         ->assertSee('Search movies')
         ->assertSee('Neon Harbor')
         ->assertSee('Director Ava Chen')
-        ->assertSee('Actor:')
+        ->assertSee('Cast:')
         ->assertSee('Leo Vance')
-        ->assertSee('Actress:')
         ->assertSee('Maya Reed')
         ->assertSee('10.0');
 });
@@ -44,9 +46,9 @@ it('renders a database movie with its cast on the detail page', function () {
     ]);
     $person = Person::factory()->create([
         'name' => 'Maya Reed',
-        'role' => 'actress',
+        'role' => 'person',
     ]);
-    $movie->people()->attach($person);
+    $movie->people()->attach($person, ['role' => 'cast']);
 
     $response = $this->get(route('movies.show', $movie));
 
@@ -58,7 +60,6 @@ it('renders a database movie with its cast on the detail page', function () {
         ->assertSee('A rain-soaked port city hides a smuggling ring that trades in stolen memories.')
         ->assertSee('Cast')
         ->assertSee('Maya Reed')
-        ->assertSee('Actress')
         ->assertSee('Log in to like');
 });
 

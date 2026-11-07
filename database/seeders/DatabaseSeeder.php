@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(GenreSeeder::class);
+
         Movie::factory()
             ->count(6)
             ->create()

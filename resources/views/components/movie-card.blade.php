@@ -2,8 +2,9 @@
 
 @php
     $posterUrl = $movie->poster ?: 'https://www.primevideo.com/-/hi/detail/0P5699HX4S6UTRBOYYMCIGWTK3.jpg/ref=atv_hm_hom_c_8pXz9d_2_1';
-    $actors = $movie->people->filter(fn ($person) => strtolower($person->role) === 'actor')->pluck('name');
-    $actresses = $movie->people->filter(fn ($person) => strtolower($person->role) === 'actress')->pluck('name');
+    $directors = $movie->people->filter(fn ($person) => $person->pivot->role === 'director')->pluck('name');
+    $cast = $movie->people->filter(fn ($person) => $person->pivot->role === 'cast')->pluck('name');
+    $genres = $movie->genres->pluck('name')->join(' · ') ?: $movie->genre;
 @endphp
 
 <article class="group overflow-hidden rounded-2xl border border-line/70 bg-panel/80 shadow-lg shadow-black/15 transition duration-300 hover:-translate-y-1 hover:border-gold/60 hover:shadow-xl hover:shadow-black/25">
@@ -20,21 +21,15 @@
         </div>
         <div class="flex flex-col gap-1.5 p-5">
             <h2 class="text-base font-semibold tracking-tight text-white">{{ $movie->title }}</h2>
-            <p class="text-sm text-mist/80">Director {{ $movie->director ?? 'Not listed' }}</p>
+            <p class="text-sm text-mist/80">Director {{ $directors->join(', ') ?: ($movie->director ?? 'Not listed') }}</p>
 
-            @if ($actors->isNotEmpty())
+            @if ($cast->isNotEmpty())
                 <p class="text-xs text-mist/75">
-                    <span class="font-medium text-gold/90">Actor:</span> {{ $actors->join(', ') }}
+                    <span class="font-medium text-gold/90">Cast:</span> {{ $cast->join(', ') }}
                 </p>
             @endif
 
-            @if ($actresses->isNotEmpty())
-                <p class="text-xs text-mist/75">
-                    <span class="font-medium text-gold/90">Actress:</span> {{ $actresses->join(', ') }}
-                </p>
-            @endif
-
-            <p class="text-xs text-mist/60 mt-0.5">{{ $movie->genre }}</p>
+            <p class="mt-0.5 text-xs text-mist/60">{{ $genres }}</p>
         </div>
     </a>
     <div class="px-5 pb-5">

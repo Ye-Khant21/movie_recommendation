@@ -1,6 +1,9 @@
 <x-layouts.app :title="$movie->title">
     @php
         $posterUrl = $movie->poster ?: 'https://www.primevideo.com/-/hi/detail/0P5699HX4S6UTRBOYYMCIGWTK3.jpg/ref=atv_hm_hom_c_8pXz9d_2_1';
+        $directors = $movie->people->filter(fn ($person) => $person->pivot->role === 'director')->pluck('name');
+        $cast = $movie->people->filter(fn ($person) => $person->pivot->role === 'cast');
+        $genres = $movie->genres->pluck('name')->join(' · ') ?: $movie->genre;
     @endphp
 
     <div class="relative">
@@ -22,10 +25,10 @@
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-3">
                         <x-rating-badge :rating="$movie->rating" />
-                        <span class="text-sm text-mist/70">{{ $movie->genre }}</span>
+                        <span class="text-sm text-mist/70">{{ $genres }}</span>
                     </div>
                     <h1 class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">{{ $movie->title }}</h1>
-                    <p class="text-lg text-gold">Director {{ $movie->director ?? 'Not listed' }}</p>
+                    <p class="text-lg text-gold">Director {{ $directors->join(', ') ?: ($movie->director ?? 'Not listed') }}</p>
                     <div class="flex flex-wrap gap-3">
                         <x-like-button :movie-id="$movie->id" :liked="in_array($movie->id, $likedMovieIds, true)" />
                     </div>
@@ -44,9 +47,9 @@
             <section class="flex flex-col gap-4">
                 <h2 class="text-2xl font-semibold text-white">Cast</h2>
                 <div class="flex flex-wrap gap-3">
-                    @forelse ($movie->people as $person)
+                    @forelse ($cast as $person)
                         <span class="rounded-full border border-line bg-panel px-3.5 py-2 text-sm text-mist">
-                            {{ $person->name }} · {{ ucfirst($person->role) }}
+                            {{ $person->name }}@if (filled($person->pivot->character_name)) · {{ $person->pivot->character_name }}@endif
                         </span>
                     @empty
                         <p class="text-sm text-mist/70">No cast members have been added yet.</p>
